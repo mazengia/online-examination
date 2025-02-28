@@ -5,6 +5,8 @@ import {
 } from '@angular/fire/auth';
 import {Users} from "../model/user";
 import {FirestoreService} from "./firestore.service";
+import {Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -16,9 +18,10 @@ export class FireAuthService {
     this.listenToAuthStateChanges();
   }
 
-  private listenToAuthStateChanges(): void {
-    authState(this.auth).subscribe((user: User | null) => {
+  listenToAuthStateChanges() {
+    authState(this.auth).subscribe((user: any) => {
       if (user) {
+        return user;
         // User is signed in
       } else {
         // User is signed out
@@ -34,11 +37,11 @@ export class FireAuthService {
           await sendEmailVerification(cred.user);
         }
         await this.firestoreService.addNewUser(user, cred);
-        this.user = cred.user;
+        await this.signOut();
+
       }
       return cred;
     } catch (error) {
-      console.error("Error signing up with email and password:", error);
       throw error;
     }
   }
@@ -60,6 +63,7 @@ export class FireAuthService {
       throw error;
     }
   }
+
   public async forgotPassword(email: string): Promise<void> {
     try {
       await sendPasswordResetEmail(this.auth, email);
@@ -69,6 +73,7 @@ export class FireAuthService {
       throw error;
     }
   }
+
   public async signOut(): Promise<void> {
     await this.auth.signOut();
   }
@@ -82,4 +87,11 @@ export class FireAuthService {
   }
 
 
+  isAuthenticated(): Observable<any> {
+    return authState(this.auth).pipe(
+      map((user: User | null) => {
+        return user
+      })
+    );
+  }
 }

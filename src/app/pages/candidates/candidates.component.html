@@ -1,0 +1,33 @@
+<nz-table
+  [nzTitle]="Header"
+  [nzData]="transactions"
+  [nzTotal]="totalElements"
+  [nzFrontPagination]="false"
+  [nzBordered]="true"
+  nzShowSizeChanger
+  [(nzPageIndex)]="pageIndex"
+  [(nzPageSize)]="pageSize">
+  <thead>
+    <tr>
+      <th nzAlign="center">#</th>
+      <th nzAlign="center">Full Name</th>
+      <th nzAlign="center">Email</th>
+      <th nzAlign="center">Password</th>
+    </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let candidate of candidates; let i=index">
+    <td nzAlign="center">{{ i+1 }}</td>
+    <td nzAlign="center">{{ candidate?.fullName }}</td>
+    <td nzAlign="center">{{ candidate?.email }}</td>
+    <td nzAlign="center">Password</td>
+  </tr>
+  </tbody>
+</nz-table>
+<ng-template #Header>
+  <nz-row nzJustify="end">
+    <button (click)="openDrawer(undefined)">
+      <i nz-icon nzType="plus" nzTheme="outline"></i>New
+    </button>
+  </nz-row>
+</ng-template>

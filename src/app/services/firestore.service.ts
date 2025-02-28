@@ -19,8 +19,9 @@ import {Auth, UserCredential} from "@angular/fire/auth";
 })
 export class FirestoreService {
 
-  constructor(private firestore: Firestore,private auth: Auth) {
+  constructor(private firestore: Firestore, private auth: Auth) {
   }
+
   async getUserRole(): Promise<string | null> {
     const user = this.auth.currentUser;
     if (user) {
@@ -32,6 +33,7 @@ export class FirestoreService {
     }
     return null; // Return null if no user is logged in or no role found
   }
+
   async addNewRecord(newData: Candidate): Promise<void> {
     try {
       const collectionRef = collection(this.firestore, 'candidates');
@@ -42,6 +44,7 @@ export class FirestoreService {
       throw error;
     }
   }
+
   async updateRecord(documentId: string, updatedData: Partial<Candidate>): Promise<void> {
     try {
       const documentRef = doc(this.firestore, `candidates/${documentId}`);
@@ -63,15 +66,12 @@ export class FirestoreService {
       throw error;
     }
   }
-  async addNewUser(user: Users,cred: UserCredential): Promise<void> {
-    try {
 
+  async addNewUser(user: Users, cred: UserCredential): Promise<void> {
+    try {
       const userDoc = doc(this.firestore, `users/${cred.user.uid}`);
       await setDoc(userDoc, user);
-
-      alert('Signup successful!');
     } catch (error) {
-      console.error("Error adding document: ", error);
       throw error;
     }
   }
