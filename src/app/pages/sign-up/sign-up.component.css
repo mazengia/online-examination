@@ -1,0 +1,86 @@
+/* Auth container styles */
+.auth-container {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;  /* Center the container */
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Title styles */
+.auth-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Form input fields styles */
+.auth-container form div {
+  margin-bottom: 15px;
+}
+
+.auth-container label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #555;
+}
+
+.auth-container input[type="email"],
+.auth-container input[type="text"],
+.auth-container input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.auth-container input[type="email"]:focus,
+.auth-container input[type="text"]:focus,
+.auth-container input[type="password"]:focus {
+  border-color: #4caf50;
+  outline: none;
+}
+
+/* Error message styles */
+.auth-container .error {
+  color: red;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+/* Submit button styles */
+.auth-container button[type="submit"] {
+  width: 100%;
+  padding: 12px;
+  background-color: #4caf50;
+  border: none;
+  color: white;
+  font-size: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.auth-container button[type="submit"]:hover {
+  background-color: #45a049;
+}
+
+/* Link styles */
+.auth-container p {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.auth-container a {
+  color: #4caf50;
+  text-decoration: none;
+}
+
+.auth-container a:hover {
+  text-decoration: underline;
+}
