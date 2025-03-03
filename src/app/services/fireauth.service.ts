@@ -38,14 +38,27 @@ export class FireAuthService {
         }
         await this.firestoreService.addNewUser(user, cred);
         await this.signOut();
-
       }
       return cred;
     } catch (error) {
       throw error;
     }
   }
-
+  public async signUpWithEmailAndPasswordCandidates(user: Users): Promise<UserCredential> {
+    try {
+      const cred = await createUserWithEmailAndPassword(this.auth, user.email, user.password);
+      if (cred.user) {
+        if (!cred.user.emailVerified) {
+          await sendEmailVerification(cred.user);
+        }
+        await this.firestoreService.addNewUser(user, cred);
+        // await this.signOut();
+      }
+      return cred;
+    } catch (error) {
+      throw error;
+    }
+  }
   public async signInWithEmailAndPassword(email: string, password: string): Promise<UserCredential> {
     try {
       const cred = await signInWithEmailAndPassword(this.auth, email, password);

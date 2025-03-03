@@ -1,45 +1,48 @@
-import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
-import {NzRowDirective} from "ng-zorro-antd/grid";
-import {NzNotificationService} from 'ng-zorro-antd/notification';
-import {NewCandidateComponent} from './new-candidate/new-candidate.component';
-import {NzDrawerService} from 'ng-zorro-antd/drawer';
-import {NzCellAlignDirective, NzTableComponent} from 'ng-zorro-antd/table';
-import {NzIconDirective} from 'ng-zorro-antd/icon';
-import {FirestoreService} from '../../services/firestore.service';
-import {Candidate} from '../../model/Candidate';
-import {NgForOf} from '@angular/common';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
+import { NzDrawerService } from 'ng-zorro-antd/drawer';
+import { FirestoreService } from '../../services/firestore.service';
+import { Candidate } from '../../model/Candidate';
+import { FireAuthService } from '../../services/fireauth.service';
+import { Subscription } from 'rxjs';
+import { CommonModule } from '@angular/common';
+import { NewCandidateComponent } from './new-candidate/new-candidate.component';
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import {NzRowDirective} from 'ng-zorro-antd/grid';
+import {Users} from '../../model/user';
 
 @Component({
   selector: 'app-candidates',
+  standalone: true,
   imports: [
+    CommonModule,
     FormsModule,
-    NzRowDirective,
     ReactiveFormsModule,
-    NzTableComponent,
-    NzIconDirective,
-    NzCellAlignDirective,
-    NgForOf
+    NzTableModule,
+    NzIconModule,
+    NzRowDirective
   ],
   templateUrl: './candidates.component.html',
-  styleUrl: './candidates.component.css',
+  styleUrls: ['./candidates.component.css'],
   providers: [NzDrawerService],
 })
-export class CandidatesComponent implements OnInit {
-  candidates: Candidate[] = []
+export class CandidatesComponent implements OnInit, OnDestroy {
+  users: Users[] = [];
   totalElements!: number;
   pageIndex = 0;
   pageSize = 10;
-  loading = true;
   transactions: any[] = [];
+  isAuthenticated: any;
   searchForm: FormGroup;
-  isVisible = false;
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
-    private notification: NzNotificationService,
     private formBuilder: FormBuilder,
     private drawerService: NzDrawerService,
-    private candidateService: FirestoreService) {
+    private authService: FireAuthService,
+    private candidateService: FirestoreService
+  ) {
     this.searchForm = this.formBuilder.group({
       dateRange: [null, Validators.required],
       branchCode: [null, Validators.required],
@@ -48,74 +51,47 @@ export class CandidatesComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.loadAllData();
-  }
+    const authSub = this.authService.isAuthenticated().subscribe(authenticated => {
+      this.isAuthenticated = authenticated;
+      console.log("this.isAuthenticated=", this.isAuthenticated);
+      this.loadAllData();
+    });
 
+    this.subscriptions.add(authSub);
+  }
 
   loadAllData(reset: boolean = false) {
     if (reset) {
       this.pageIndex = 0;
     }
-     this.candidateService.getAllCandidates().subscribe(
-      (candidates: Candidate[]) => {
-        this.candidates = candidates;
-        console.log("candidates=", candidates)
+
+    const usersList = this.candidateService.getAnOrganizationsCandidates(this.isAuthenticated.email).subscribe(
+      (users: Users[]) => {
+        this.users = users;
+        console.log("users=", users);
       },
-      (error) => {
-        console.error("Error   candidates:", error);
+      (error: any) => {
+        console.error("Error fetching candidates:", error);
       }
     );
 
+    this.subscriptions.add(usersList);
   }
-
 
   openDrawer(requestId: any) {
+    const drawerRef = this.drawerService.create<NewCandidateComponent, { id: number }>({
+      nzWidth: 600,
+      nzPlacement: "right",
+      nzContent: NewCandidateComponent,
+      nzContentParams: {
+        idValue: requestId,
+      },
+    });
 
-    const drawerRef = this.drawerService
-      .create<NewCandidateComponent, { id: number }>({
-        nzWidth: 600,
-        nzPlacement: "right",
-        nzContent: NewCandidateComponent,
-        nzContentParams: {
-          idValue: requestId,
-        },
-      })
-
-    drawerRef.afterClose.subscribe(() => {
-      this.loadAllData()
-    })
+    drawerRef.afterClose.subscribe(() => this.loadAllData());
   }
 
-
-  openDetailDrawer(requestId: any) {
-    const drawerRef = this.drawerService
-      .create<NewCandidateComponent, { requestId: any }>({
-        nzWidth: "900px",
-        nzContent: NewCandidateComponent,
-        nzContentParams: {
-          requestId: requestId,
-        },
-      })
-
-
-    drawerRef.afterClose.subscribe(() => {
-      this.loadAllData()
-    })
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
   }
-
-  deleteById(requestId: any): void {
-
-  }
-
-  showModal(requestId: any): void {
-    this.getDataById(requestId)
-    this.isVisible = true;
-  }
-
-  getDataById(requestId: any) {
-
-  }
-
 }
-
-

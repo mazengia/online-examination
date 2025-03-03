@@ -8,21 +8,19 @@
   [(nzPageIndex)]="pageIndex"
   [(nzPageSize)]="pageSize">
   <thead>
-    <tr>
-      <th nzAlign="center">#</th>
-      <th nzAlign="center">Full Name</th>
-      <th nzAlign="center">Email</th>
-      <th nzAlign="center">Role</th>
-      <th nzAlign="center">CreatedAt</th>
-    </tr>
+  <tr>
+    <th nzAlign="center">#</th>
+    <th nzAlign="center">Full Name</th>
+    <th nzAlign="center">Email</th>
+    <th nzAlign="center">Password</th>
+  </tr>
   </thead>
   <tbody>
-  <tr *ngFor="let user of users; let i=index">
+  <tr *ngFor="let candidate of candidates; let i=index">
     <td nzAlign="center">{{ i+1 }}</td>
-    <td nzAlign="center">{{ user?.name }}</td>
-    <td nzAlign="center">{{ user?.email }}</td>
-    <td nzAlign="center">{{ user?.role }}</td>
-    <td nzAlign="center">{{ user?.createdAt }}</td>
+<!--    <td nzAlign="center">{{ candidate?.fullName }}</td>-->
+<!--    <td nzAlign="center">{{ candidate?.email }}</td>-->
+    <td nzAlign="center">Password</td>
   </tr>
   </tbody>
 </nz-table>

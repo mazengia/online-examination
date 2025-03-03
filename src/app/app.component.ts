@@ -20,13 +20,9 @@ import {Auth} from '@angular/fire/auth';
 export class AppComponent implements OnInit {
   isAuthenticated:any;
   isCollapsed: boolean = false;
-  currentUser: any;
-
   constructor(
     private authService: FireAuthService,
-    private router: Router,
-    private auth: Auth) {
-    this.currentUser = this.authService.getCurrentUser();
+    private router: Router ) {
 
   }
 

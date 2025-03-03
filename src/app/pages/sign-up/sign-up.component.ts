@@ -29,10 +29,6 @@ import {NzRowDirective} from 'ng-zorro-antd/grid';
 })
 export class SignUpComponent {
   user!: Users;
-  name: string = '';
-  role: string = 'voter';
-  email = '';
-  password = '';
   errorMessage = '';
   validateForm!: FormGroup
 
@@ -43,9 +39,11 @@ export class SignUpComponent {
   ) {
     this.validateForm = this.fb.group({
       fullName: this.fb.control('', [Validators.required]),
+      phoneNumber: this.fb.control('', [Validators.required]),
       email: this.fb.control('', [Validators.required]),
       password: this.fb.control('', [Validators.required]),
-      createdAt: this.fb.control(new Date().toISOString())
+      createdAt: this.fb.control(new Date().toISOString()),
+      role: this.fb.control('admin')
     });
   }
 

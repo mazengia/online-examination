@@ -9,16 +9,15 @@ import {
   getDocs, increment, query, setDoc,
   updateDoc, where
 } from '@angular/fire/firestore';
-import {catchError, from, Observable, throwError} from "rxjs";
+import {Observable} from "rxjs";
 import {Candidate} from "../model/Candidate";
 import {Users} from "../model/user";
 import {Auth, UserCredential} from "@angular/fire/auth";
-import {map} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
-export class FirestoreService {
+export class CandidateService {
 
   constructor(private firestore: Firestore, private auth: Auth) {
   }
@@ -70,7 +69,7 @@ export class FirestoreService {
 
   async addNewUser(user: Users, cred: UserCredential): Promise<void> {
     try {
-      const {password, ...userWithoutPassword} = user;
+      const { password, ...userWithoutPassword } = user;
 
       const userDoc = doc(this.firestore, `users/${cred.user.uid}`);
       await setDoc(userDoc, userWithoutPassword);
@@ -130,28 +129,9 @@ export class FirestoreService {
         });
     });
   }
-  getAnOrganizationsCandidates(organizationEmail: string): Observable<Users[]> {
-    if (!organizationEmail) {
-      return throwError(() => new Error('Invalid organizationEmail provided.'));
-    }
 
-    const usersCollection = collection(this.firestore, 'users');
-    const q = query(usersCollection, where('organizationId', '==', organizationEmail));
 
-    return from(getDocs(q)).pipe(
-      map((querySnapshot) => {
-        return querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...(doc.data() as Users), // Cast data properly
-        }));
-      }),
-      catchError((error) => {
-        console.error('Error fetching candidates:', error);
-        return throwError(() => new Error('Error fetching candidates: ' + error));
-      })
-    );
-  }
- async incrementVote(candidateId: string): Promise<void> {
+  async incrementVote(candidateId: string): Promise<void> {
     const candidateRef = doc(this.firestore, 'candidates', candidateId);
 
     try {

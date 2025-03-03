@@ -5,4 +5,6 @@ export interface Users {
   email:string;
   password :string;
   createdAt :string;
+  phoneNumber:number;
+  organizationId:string
 }
