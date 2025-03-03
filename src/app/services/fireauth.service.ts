@@ -13,7 +13,9 @@ import {map} from 'rxjs/operators';
 })
 export class FireAuthService {
   private user: User | null = null;
-
+  response:any=null;
+  password: any = null;
+  originalUser:any=null;
   constructor(private auth: Auth, private firestoreService: FirestoreService) {
     this.listenToAuthStateChanges();
   }
@@ -32,7 +34,7 @@ export class FireAuthService {
   public async signUpWithEmailAndPassword(user: Users): Promise<UserCredential> {
     try {
       const cred = await createUserWithEmailAndPassword(this.auth, user.email, user.password);
-      if (cred.user) {
+       if (cred.user) {
         if (!cred.user.emailVerified) {
           await sendEmailVerification(cred.user);
         }
@@ -44,24 +46,34 @@ export class FireAuthService {
       throw error;
     }
   }
+
   public async signUpWithEmailAndPasswordCandidates(user: Users): Promise<UserCredential> {
     try {
+      this.originalUser = this.auth.currentUser;
+
       const cred = await createUserWithEmailAndPassword(this.auth, user.email, user.password);
       if (cred.user) {
         if (!cred.user.emailVerified) {
           await sendEmailVerification(cred.user);
         }
         await this.firestoreService.addNewUser(user, cred);
-        // await this.signOut();
       }
-      return cred;
+      // return cred;
+      if (this.originalUser) {
+        await signInWithEmailAndPassword(this.auth, this.originalUser.email as string, user.password);
+      }
+
+      return this.response;
     } catch (error) {
       throw error;
     }
   }
+
   public async signInWithEmailAndPassword(email: string, password: string): Promise<UserCredential> {
     try {
+      this.password = password
       const cred = await signInWithEmailAndPassword(this.auth, email, password);
+      this.response = cred;
 
       if (cred.user) {
         if (!cred.user.emailVerified) {
@@ -70,7 +82,7 @@ export class FireAuthService {
         this.user = cred.user;
       }
 
-      return cred;
+      return this.response;
     } catch (error) {
       console.error('Error signing in:', error);
       throw error;
@@ -95,9 +107,6 @@ export class FireAuthService {
     return sendPasswordResetEmail(this.auth, email);
   }
 
-  getCurrentUser() {
-    return this.auth.currentUser?.uid;
-  }
 
 
   isAuthenticated(): Observable<any> {

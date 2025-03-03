@@ -8,6 +8,7 @@ import {NzRowDirective} from "ng-zorro-antd/grid";
 import {Users} from '../../../model/user';
 import {NzNotificationService} from 'ng-zorro-antd/notification';
 import {FireAuthService} from '../../../services/fireauth.service';
+import {FirestoreService} from '../../../services/firestore.service';
 
 @Component({
   selector: 'app-new-candidate',
@@ -27,7 +28,7 @@ import {FireAuthService} from '../../../services/fireauth.service';
   styleUrl: './new-candidate.component.css'
 })
 export class NewCandidateComponent implements OnInit {
-  @Input() idValue!: number;
+  @Input() idValue!: string;
 
   user!: Users;
   errorMessage = '';
@@ -37,6 +38,7 @@ export class NewCandidateComponent implements OnInit {
   constructor(private notification: NzNotificationService,
               private fb: FormBuilder,
               private authService: FireAuthService,
+              private firestoreService: FirestoreService
   ) {
     this.validateForm = this.fb.group({
       name: this.fb.control('', [Validators.required]),
@@ -52,6 +54,17 @@ export class NewCandidateComponent implements OnInit {
     this.authService.isAuthenticated().subscribe((authenticated) => {
       this.isAuthenticated = authenticated;
     });
+    if (this.idValue) {
+      this.getCandidateByDocumentId();
+    }
+  }
+
+  onFormSubmit() {
+    if (this.idValue) {
+      this.updateCandidates();
+    } else {
+      this.signUpCandidates();
+    }
   }
 
   signUpCandidates() {
@@ -65,6 +78,31 @@ export class NewCandidateComponent implements OnInit {
       }
     );
 
+  }
+
+  updateCandidates() {
+    this.validateForm.controls['organizationId'].setValue(this.isAuthenticated?.email)
+    this.firestoreService.updateCandidateById(this.idValue, this.validateForm.value).then(
+      (user) => {
+        this.notification.success("Success", "Account updated successfully.");
+      },
+      (error) => {
+        console.error("Error during sign-up:", error);
+      }
+    );
+
+  }
+
+  private async getCandidateByDocumentId() {
+    try {
+      const user = await this.firestoreService.getCandidateById(this.idValue);
+      if (user) {
+        console.log("User=", user);
+        this.validateForm.patchValue(user);
+      }
+    } catch (error) {
+      console.error("Error fetching candidate:", error);
+    }
   }
 
 }

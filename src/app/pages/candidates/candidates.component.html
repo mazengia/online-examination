@@ -8,21 +8,28 @@
   [(nzPageIndex)]="pageIndex"
   [(nzPageSize)]="pageSize">
   <thead>
-    <tr>
-      <th nzAlign="center">#</th>
-      <th nzAlign="center">Full Name</th>
-      <th nzAlign="center">Email</th>
-      <th nzAlign="center">Role</th>
-      <th nzAlign="center">CreatedAt</th>
-    </tr>
+  <tr>
+    <th nzAlign="center">#</th>
+    <th nzAlign="center">Full Name</th>
+    <th nzAlign="center">Email</th>
+    <th nzAlign="center">Role</th>
+    <th nzAlign="center">CreatedAt</th>
+    <th nzAlign="center">Action</th>
+  </tr>
   </thead>
   <tbody>
   <tr *ngFor="let user of users; let i=index">
-    <td nzAlign="center">{{ i+1 }}</td>
+    <td nzAlign="center">{{ i + 1 }}</td>
     <td nzAlign="center">{{ user?.name }}</td>
     <td nzAlign="center">{{ user?.email }}</td>
     <td nzAlign="center">{{ user?.role }}</td>
     <td nzAlign="center">{{ user?.createdAt }}</td>
+    <td nzAlign="center">
+      <a (click)="openDrawer(user?.id)"><i nz-icon nzType="edit"></i></a>
+      <nz-divider nzType="vertical"></nz-divider>
+      <a (click)="deleteByDocumentId(user?.id,user?.email)"><i nz-icon nzType="delete"></i></a>
+
+    </td>
   </tr>
   </tbody>
 </nz-table>
