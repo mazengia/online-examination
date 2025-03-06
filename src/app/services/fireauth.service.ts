@@ -13,22 +13,19 @@ import {HttpClient} from '@angular/common/http';
   providedIn: 'root'
 })
 export class FireAuthService {
-  private user: User | null = null;  // Current authenticated user
-  response: UserCredential | null = null;  // Holds response for sign-in/signup
-  password: string | null = null;  // Stores the password temporarily for sign-in
-
+  private user: User | null = null;
+  response: UserCredential | null = null;
+  password: string | null = null;
   constructor(private auth: Auth, private firestoreService: FirestoreService, private http: HttpClient) {
     this.listenToAuthStateChanges();
   }
 
-  // Listens to authentication state changes and updates the user object accordingly
   private listenToAuthStateChanges(): void {
     authState(this.auth).subscribe((user: User | null) => {
       this.user = user;  // Update the current user if authenticated
     });
   }
 
-  // Method to get the Firebase ID Token for the currently signed-in user
   public getIdToken(): Promise<string> {
     if (this.user) {
       return this.user.getIdToken(); // Fetch the ID token from the current authenticated user
@@ -36,8 +33,6 @@ export class FireAuthService {
       return Promise.reject('No user is signed in');  // Reject if no user is authenticated
     }
   }
-
-  // Signup method using email and password, and add the user to Firestore
   public async signUpWithEmailAndPassword(user: Users): Promise<UserCredential> {
     try {
       const cred = await createUserWithEmailAndPassword(this.auth, user.email, user.password);
@@ -127,5 +122,23 @@ export class FireAuthService {
         return !!token;  // Return true if token is found, else false
       })
     );
+  }
+  public async signUpWithEmailAndPasswordCandidates(user: Users): Promise<UserCredential | null> {
+    try {
+     let originalUser =localStorage.getItem('firebase_user');
+      const cred = await createUserWithEmailAndPassword(this.auth, user.email, user.password);
+      if (cred.user) {
+        if (!cred.user.emailVerified) {
+          await sendEmailVerification(cred.user);
+        }
+        await this.firestoreService.addNewUser(user, cred);
+      }
+      if (originalUser) {
+        await signInWithEmailAndPassword(this.auth, originalUser as string, user.password);
+      }
+      return this.response;
+    } catch (error) {
+      throw error;
+    }
   }
 }

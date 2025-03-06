@@ -46,14 +46,12 @@ export class NewCandidateComponent implements OnInit {
       password: this.fb.control('', [Validators.required]),
       createdAt: this.fb.control(new Date().toISOString()),
       role: this.fb.control('candidate'),
-      organizationId: this.fb.control(this.isAuthenticated?.email)
+      organizationId: this.fb.control(this.isAuthenticated)
     });
   }
 
   ngOnInit() {
-    this.authService.isAuthenticated().subscribe((authenticated) => {
-      this.isAuthenticated = authenticated;
-    });
+      this.isAuthenticated = localStorage.getItem('firebase_user')
     if (this.idValue) {
       this.getCandidateByDocumentId();
     }
@@ -68,15 +66,15 @@ export class NewCandidateComponent implements OnInit {
   }
 
   signUpCandidates() {
-    this.validateForm.controls['organizationId'].setValue(this.isAuthenticated?.email)
-    // this.authService.signUpWithEmailAndPasswordCandidates(this.validateForm.value).then(
-    //   (user) => {
-    //     this.notification.success("Success", "Account created successfully.");
-    //   },
-    //   (error) => {
-    //     console.error("Error during sign-up:", error);
-    //   }
-    // );
+    this.validateForm.controls['organizationId'].setValue(this.isAuthenticated)
+    this.authService.signUpWithEmailAndPasswordCandidates(this.validateForm.value).then(
+      (user) => {
+        this.notification.success("Success", "Account created successfully.");
+      },
+      (error) => {
+        console.error("Error during sign-up:", error);
+      }
+    );
 
   }
 

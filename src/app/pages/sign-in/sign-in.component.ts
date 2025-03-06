@@ -36,8 +36,6 @@ export class SignInComponent {
       this.authService.login(this.email, this.password).subscribe(
         (user) => {
           console.log('User signed in successfully:', user);
-
-          // Assuming the token is returned in the user object
           const token = user.idToken;
           const email = user.email
           localStorage.setItem('firebase_token', token);
