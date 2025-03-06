@@ -22,10 +22,16 @@ export class AuthGuard implements CanActivate {
       map((user: User | null) => {
         if (user) {
           return true;
-        } else {
-          this.router.navigate(['/sign-in']).then(r => {});
-          return false;
         }
+
+        const token = localStorage.getItem('firebase_token');
+        if (token) {
+          return true;
+        }
+
+        // If no user or token found, redirect to sign-in page
+        this.router.navigate(['/sign-in']).then(() => {});
+        return false;
       })
     );
   }

@@ -9,8 +9,6 @@ import {NzDropDownDirective, NzDropdownMenuComponent} from 'ng-zorro-antd/dropdo
 import {NzAvatarComponent} from 'ng-zorro-antd/avatar';
 import {NzDividerComponent} from 'ng-zorro-antd/divider';
 import {NzColDirective, NzRowDirective} from 'ng-zorro-antd/grid';
-import {Auth} from '@angular/fire/auth';
-
 @Component({
   selector: 'app-root',
   imports: [RouterLink, RouterOutlet, NzIconModule, NzLayoutModule, NzMenuModule, NgIf, NzDropDownDirective, NzAvatarComponent, NzDividerComponent, NzDropdownMenuComponent, NzRowDirective, NzColDirective],
@@ -27,10 +25,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.authService.isAuthenticated().subscribe((authenticated) => {
-      this.isAuthenticated = authenticated;
-    });
-
+    this.isAuthenticated =  localStorage.getItem('firebase_user');
   }
 
   onLogOut() {

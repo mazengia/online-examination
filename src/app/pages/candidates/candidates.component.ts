@@ -2,17 +2,16 @@ import {Component, OnInit, OnDestroy} from '@angular/core';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {NzDrawerService} from 'ng-zorro-antd/drawer';
 import {FirestoreService} from '../../services/firestore.service';
-import {Candidate} from '../../model/Candidate';
-import {FireAuthService} from '../../services/fireauth.service';
 import {Subscription} from 'rxjs';
 import {CommonModule} from '@angular/common';
 import {NewCandidateComponent} from './new-candidate/new-candidate.component';
 import {NzTableModule} from 'ng-zorro-antd/table';
 import {NzIconModule} from 'ng-zorro-antd/icon';
 import {NzRowDirective} from 'ng-zorro-antd/grid';
-import {Users} from '../../model/user';
 import {NzNotificationService} from 'ng-zorro-antd/notification';
 import {NzDividerComponent} from 'ng-zorro-antd/divider';
+import {HTTP_INTERCEPTORS} from '@angular/common/http';
+import {AuthInterceptorService} from '../../auth-interceptor.service';
 
 @Component({
   selector: 'app-candidates',
@@ -28,7 +27,14 @@ import {NzDividerComponent} from 'ng-zorro-antd/divider';
   ],
   templateUrl: './candidates.component.html',
   styleUrls: ['./candidates.component.css'],
-  providers: [NzDrawerService],
+  providers: [
+    NzDrawerService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptorService,
+      multi: true
+    }
+  ],
 })
 export class CandidatesComponent implements OnInit, OnDestroy {
   users: any[] = [];
@@ -43,7 +49,6 @@ export class CandidatesComponent implements OnInit, OnDestroy {
   constructor(
     private formBuilder: FormBuilder,
     private drawerService: NzDrawerService,
-    private authService: FireAuthService,
     private firestoreService: FirestoreService,
     private notification: NzNotificationService,
   ) {
@@ -55,12 +60,9 @@ export class CandidatesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    const authSub = this.authService.isAuthenticated().subscribe(authenticated => {
-      this.isAuthenticated = authenticated;
-      this.loadAllData();
-    });
-
-    this.subscriptions.add(authSub);
+    this.isAuthenticated = localStorage.getItem('firebase_user');
+    this.loadAllData();
+    this.loadAllDataByEmail();
   }
 
   loadAllData(reset: boolean = false) {
@@ -68,7 +70,7 @@ export class CandidatesComponent implements OnInit, OnDestroy {
       this.pageIndex = 0;
     }
 
-    const usersList = this.firestoreService.getAnOrganizationsCandidates(this.isAuthenticated.email).subscribe(
+    const usersList = this.firestoreService.getAnOrganizationsCandidates(this.isAuthenticated).subscribe(
       (users) => {
         this.users = users;
         console.log("users=", users);
@@ -81,8 +83,21 @@ export class CandidatesComponent implements OnInit, OnDestroy {
     this.subscriptions.add(usersList);
   }
 
-  deleteByDocumentId(documentId: string,userEmail:string) {
-    this.firestoreService.deleteCandidateById(documentId,userEmail).then(
+  loadAllDataByEmail() {
+
+    this.firestoreService.loadAllDataByEmail('mz.tesfa@gmail.com').subscribe(
+      (users) => {
+        console.log("yyy users=", users);
+      },
+      (error: any) => {
+        console.error("Error fetching users yy:", error);
+      }
+    );
+
+  }
+
+  deleteByDocumentId(documentId: string, userEmail: string) {
+    this.firestoreService.deleteCandidateById(documentId, userEmail).then(
       (user) => {
         this.notification.success("Success", "Account updated successfully.");
         this.loadAllData();

@@ -69,14 +69,14 @@ export class NewCandidateComponent implements OnInit {
 
   signUpCandidates() {
     this.validateForm.controls['organizationId'].setValue(this.isAuthenticated?.email)
-    this.authService.signUpWithEmailAndPasswordCandidates(this.validateForm.value).then(
-      (user) => {
-        this.notification.success("Success", "Account created successfully.");
-      },
-      (error) => {
-        console.error("Error during sign-up:", error);
-      }
-    );
+    // this.authService.signUpWithEmailAndPasswordCandidates(this.validateForm.value).then(
+    //   (user) => {
+    //     this.notification.success("Success", "Account created successfully.");
+    //   },
+    //   (error) => {
+    //     console.error("Error during sign-up:", error);
+    //   }
+    // );
 
   }
 

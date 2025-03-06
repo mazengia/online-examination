@@ -5,7 +5,6 @@ import {
   deleteDoc,
   doc,
   Firestore, getDoc,
-  getDocFromServer,
   getDocs, increment, query, setDoc,
   updateDoc, where
 } from '@angular/fire/firestore';
@@ -14,15 +13,16 @@ import {Candidate} from "../model/Candidate";
 import {Users} from "../model/user";
 import {Auth, UserCredential} from "@angular/fire/auth";
 import {map} from 'rxjs/operators';
-
-// import { getAuth } from "firebase-admin/auth"; // Import Firebase Admin Auth
+import {HttpClient, HttpHeaders} from '@angular/common/http';
+const headers = new HttpHeaders();
+headers.set("Content-Type", "application/json");
 
 @Injectable({
   providedIn: 'root'
 })
 export class FirestoreService {
 
-  constructor(private firestore: Firestore, private auth: Auth) {
+  constructor(private firestore: Firestore, private auth: Auth,private http:HttpClient) {
   }
 
   async getUserRole(): Promise<string | null> {
@@ -219,6 +219,18 @@ export class FirestoreService {
     );
     let snapshot = await getDocs(userVotesQuery);
     return !snapshot.empty;
+  }
+
+  loadAllDataByEmail(email: any): Observable<any> {
+    const token = localStorage.getItem('firebase_token');
+    const encodedEmail = encodeURIComponent(email);
+
+    if (token) {
+      const headers = new HttpHeaders().set('Authorization', 'Bearer ' + token);
+      return this.http.get<any>(`http://localhost:8080/email/${encodedEmail}`, { headers });
+    } else {
+      return throwError('No authentication token found');
+    }
   }
 
 
