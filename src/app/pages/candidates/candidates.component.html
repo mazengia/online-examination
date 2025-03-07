@@ -1,12 +1,16 @@
 <nz-table
   [nzTitle]="Header"
-  [nzData]="transactions"
+  [nzData]="users"
   [nzTotal]="totalElements"
   [nzFrontPagination]="false"
-  [nzBordered]="true"
+  [nzLoading]="loading"
   nzShowSizeChanger
-  [(nzPageIndex)]="pageIndex"
-  [(nzPageSize)]="pageSize">
+  nzOuterBordered="nzOuterBordered"
+  [nzPageSize]="pageSize"
+  [nzPageIndex]="pageIndex"
+  nzBordered
+  (nzPageIndexChange)="getAllCandidate()"
+  (nzPageSizeChange)="getAllCandidate(true)">
   <thead>
   <tr>
     <th nzAlign="center">#</th>

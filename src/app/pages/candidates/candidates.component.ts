@@ -12,6 +12,7 @@ import {NzNotificationService} from 'ng-zorro-antd/notification';
 import {NzDividerComponent} from 'ng-zorro-antd/divider';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import {AuthInterceptorService} from '../../auth-interceptor.service';
+import {CandidateService} from '../../services/candidate.service';
 
 @Component({
   selector: 'app-candidates',
@@ -41,7 +42,7 @@ export class CandidatesComponent implements OnInit, OnDestroy {
   totalElements!: number;
   pageIndex = 0;
   pageSize = 10;
-  transactions: any[] = [];
+  loading: boolean = false;
   isAuthenticated: any;
   searchForm: FormGroup;
   private subscriptions: Subscription = new Subscription();
@@ -50,6 +51,7 @@ export class CandidatesComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private drawerService: NzDrawerService,
     private firestoreService: FirestoreService,
+    private candidateService: CandidateService,
     private notification: NzNotificationService,
   ) {
     this.searchForm = this.formBuilder.group({
@@ -61,10 +63,25 @@ export class CandidatesComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.isAuthenticated = localStorage.getItem('firebase_user');
-    this.loadAllData();
+    this.getAllCandidate();
     this.loadAllDataByEmail();
   }
-
+  getAllCandidate(reset: boolean = false) {
+    if (reset) {
+      this.pageIndex = 0;
+    }
+    this.loading = true;
+    this.candidateService.getAllCandidate(this.pageIndex, this.pageSize).subscribe(
+      response => {
+        this.users = response?.content || [];
+        this.totalElements = response?.totalElements ?? 0;
+      },
+      (error) => {
+        console.log(error, "from error");
+      }
+    );
+    this.loading = false;
+  }
   loadAllData(reset: boolean = false) {
     if (reset) {
       this.pageIndex = 0;
