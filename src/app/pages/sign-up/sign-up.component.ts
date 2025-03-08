@@ -9,6 +9,7 @@ import {NzFormControlComponent, NzFormDirective, NzFormItemComponent, NzFormLabe
 import {NzInputDirective} from 'ng-zorro-antd/input';
 import {NzButtonComponent} from 'ng-zorro-antd/button';
 import {NzRowDirective} from 'ng-zorro-antd/grid';
+import {CandidateService} from '../../services/candidate.service';
 
 @Component({
   selector: 'app-sign-up',
@@ -34,6 +35,7 @@ export class SignUpComponent {
 
   constructor(private authService: FireAuthService,
               private router: Router,
+              private candidateService:CandidateService,
               private notification: NzNotificationService,
               private fb: FormBuilder
   ) {
@@ -48,6 +50,19 @@ export class SignUpComponent {
   }
 
   signUp() {
+    this.candidateService.addNewUser(this.validateForm.value).subscribe(
+      (user) => {
+        this.notification.success("Success", "Account created successfully. Please verify your email and log in again.");
+        this.router.navigate(['/sign-in']);
+      },
+      (error) => {
+        console.error("Error during sign-up:", error);
+        this.handleSignUpError(error);
+      }
+    );
+
+  }
+  signUpOnAngular() {
     this.authService.signUpWithEmailAndPassword(this.validateForm.value).then(
       (user) => {
         this.notification.success("Success", "Account created successfully. Please verify your email and log in again.");

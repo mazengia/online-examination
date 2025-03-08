@@ -75,12 +75,13 @@ export class CandidatesComponent implements OnInit, OnDestroy {
       response => {
         this.users = response?.content || [];
         this.totalElements = response?.totalElements ?? 0;
+        this.loading = false;
       },
       (error) => {
         console.log(error, "from error");
+        this.loading = false;
       }
     );
-    this.loading = false;
   }
   loadAllData(reset: boolean = false) {
     if (reset) {

@@ -9,6 +9,7 @@ import {Users} from '../../../model/user';
 import {NzNotificationService} from 'ng-zorro-antd/notification';
 import {FireAuthService} from '../../../services/fireauth.service';
 import {FirestoreService} from '../../../services/firestore.service';
+import {CandidateService} from '../../../services/candidate.service';
 
 @Component({
   selector: 'app-new-candidate',
@@ -37,6 +38,7 @@ export class NewCandidateComponent implements OnInit {
 
   constructor(private notification: NzNotificationService,
               private fb: FormBuilder,
+              private candidateService: CandidateService,
               private authService: FireAuthService,
               private firestoreService: FirestoreService
   ) {
@@ -51,7 +53,7 @@ export class NewCandidateComponent implements OnInit {
   }
 
   ngOnInit() {
-      this.isAuthenticated = localStorage.getItem('firebase_user')
+    this.isAuthenticated = localStorage.getItem('firebase_user')
     if (this.idValue) {
       this.getCandidateByDocumentId();
     }
@@ -61,8 +63,20 @@ export class NewCandidateComponent implements OnInit {
     if (this.idValue) {
       this.updateCandidates();
     } else {
-      this.signUpCandidates();
+      this.addNewCandidates();
     }
+  }
+
+  addNewCandidates() {
+    this.validateForm.controls['organizationId'].setValue(this.isAuthenticated)
+    this.candidateService.addNewUser(this.validateForm.value).subscribe(
+      (user) => {
+        this.notification.success("Success", "Account created successfully.");
+      },
+      (error) => {
+        console.error("Error during sign-up:", error);
+      }
+    );
   }
 
   signUpCandidates() {

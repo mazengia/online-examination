@@ -25,17 +25,6 @@ export class FirestoreService {
   constructor(private firestore: Firestore, private auth: Auth,private http:HttpClient) {
   }
 
-  async getUserRole(): Promise<string | null> {
-    const user = this.auth.currentUser;
-    if (user) {
-      const userDocRef = doc(this.firestore, `users/${user.uid}`);
-      const userDoc = await getDoc(userDocRef);
-      if (userDoc.exists()) {
-        return userDoc.data()['role'] as string;
-      }
-    }
-    return null; // Return null if no user is logged in or no role found
-  }
 
   async addNewRecord(newData: Candidate): Promise<void> {
     try {
@@ -47,29 +36,6 @@ export class FirestoreService {
       throw error;
     }
   }
-
-  async updateRecord(documentId: string, updatedData: Partial<Candidate>): Promise<void> {
-    try {
-      const documentRef = doc(this.firestore, `candidates/${documentId}`);
-      await updateDoc(documentRef, updatedData);
-      console.log('Document updated successfully');
-    } catch (error) {
-      console.error('Error updating document: ', error);
-      throw error;
-    }
-  }
-
-  async deleteRecord(documentId: string): Promise<void> {
-    try {
-      const documentRef = doc(this.firestore, `candidates/${documentId}`);
-      await deleteDoc(documentRef);
-      console.log('Document deleted successfully');
-    } catch (error) {
-      console.error('Error deleting document: ', error);
-      throw error;
-    }
-  }
-
   async addNewUser(user: Users, cred: UserCredential): Promise<void> {
     try {
       const {password, ...userWithoutPassword} = user;
@@ -80,15 +46,6 @@ export class FirestoreService {
       throw error;
     }
   }
-
-  async recordVote(userId: string, candidateId: string): Promise<void> {
-    await addDoc(collection(this.firestore, 'userVotes'), {
-      userId: userId,
-      candidateId: candidateId,
-      timestamp: new Date(),
-    });
-  }
-
 
   getAllCandidates(): Observable<Candidate[]> {
     const collectionRef = collection(this.firestore, 'candidates');
@@ -193,34 +150,6 @@ export class FirestoreService {
       throw error;
     }
   }
-
-  async incrementVote(candidateId: string): Promise<void> {
-    const candidateRef = doc(this.firestore, 'candidates', candidateId);
-
-    try {
-      let docSnap = await getDoc(candidateRef);
-      if (!docSnap.exists()) {
-        console.error(`Candidate with ID ${candidateId} does not exist.`);
-        throw new Error(`Candidate with ID ${candidateId} does not exist.`);
-      }
-      return updateDoc(candidateRef, {
-        voteCount: increment(1),
-      });
-    } catch (error) {
-      console.error('Error incrementing vote:', error);
-      throw error;
-    }
-  }
-
-  async hasVoted(userId: string): Promise<boolean> {
-    const userVotesQuery = query(
-      collection(this.firestore, 'userVotes'),
-      where('userId', '==', userId)
-    );
-    let snapshot = await getDocs(userVotesQuery);
-    return !snapshot.empty;
-  }
-
   loadAllDataByEmail(email: any): Observable<any> {
     const token = localStorage.getItem('firebase_token');
     const encodedEmail = encodeURIComponent(email);
@@ -232,6 +161,4 @@ export class FirestoreService {
       return throwError('No authentication token found');
     }
   }
-
-
 }

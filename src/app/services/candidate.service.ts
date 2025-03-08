@@ -36,11 +36,27 @@ export class CandidateService {
       .set('Authorization', 'Bearer ' + token);
     const url = `${baseUrl}/users?page=${pageIndex}&size=${pageSize}`;
 
-    return this.http.get<any>(url, { headers }).pipe(
+    return this.http.get<any>(url, {headers}).pipe(
       catchError(error => {
         return throwError(() => new Error(error.message || 'Failed to fetch candidates'));
       })
     );
   }
+
+  addNewUser(user: any): Observable<any> {
+    const token = localStorage.getItem('firebase_token');
+    if (!token) {
+      return throwError(() => new Error('No authentication token found'));
+    }
+    const headers = new HttpHeaders()
+      .set('Authorization', 'Bearer ' + token);
+
+    return this.http.post<any>(`${baseUrl}/candidates`, user, { headers }).pipe(
+      catchError(error => {
+        return throwError(() => new Error(error.message || 'Failed to fetch candidates'));
+      })
+    );
+  }
+
 
 }
