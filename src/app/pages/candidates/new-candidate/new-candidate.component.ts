@@ -1,5 +1,13 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule, ValidationErrors,
+  ValidatorFn,
+  Validators
+} from "@angular/forms";
 import {NgIf} from "@angular/common";
 import {NzButtonComponent} from "ng-zorro-antd/button";
 import {NzFormControlComponent, NzFormDirective, NzFormItemComponent, NzFormLabelComponent} from "ng-zorro-antd/form";
@@ -42,9 +50,15 @@ export class NewCandidateComponent implements OnInit {
               private authService: FireAuthService,
               private firestoreService: FirestoreService
   ) {
+    function ethiopianPhoneValidator() {
+      return (control: AbstractControl): ValidationErrors | null => {
+        const ethiopianPhonePattern = /^(?:\+2519\d{8}|09\d{8})$/;
+        return ethiopianPhonePattern.test(control.value) ? null : { invalidPhone: true };
+      };    }
+
     this.validateForm = this.fb.group({
       name: this.fb.control('', [Validators.required]),
-      phoneNumber: this.fb.control('', [Validators.required]),
+      phoneNumber: this.fb.control('', [Validators.required, ethiopianPhoneValidator()]),
       email: this.fb.control('', [Validators.required]),
       password: this.fb.control('', [Validators.required]),
       role: this.fb.control('candidate'),
@@ -66,6 +80,13 @@ export class NewCandidateComponent implements OnInit {
       this.addNewCandidates();
     }
   }
+
+  ethiopianPhoneValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const ethiopianPhonePattern = /^(?:\+2519\d{8}|09\d{8})$/;
+      return ethiopianPhonePattern.test(control.value) ? null : { invalidPhone: true };
+    };
+  };
 
   addNewCandidates() {
     this.validateForm.controls['organizationId'].setValue(this.isAuthenticated)
