@@ -44,9 +44,9 @@ export class NewCandidateComponent implements OnInit {
   ) {
     this.validateForm = this.fb.group({
       name: this.fb.control('', [Validators.required]),
+      phoneNumber: this.fb.control('', [Validators.required]),
       email: this.fb.control('', [Validators.required]),
       password: this.fb.control('', [Validators.required]),
-      createdAt: this.fb.control(new Date().toISOString()),
       role: this.fb.control('candidate'),
       organizationId: this.fb.control(this.isAuthenticated)
     });

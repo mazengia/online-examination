@@ -35,33 +35,33 @@ export class SignUpComponent {
 
   constructor(private authService: FireAuthService,
               private router: Router,
-              private candidateService:CandidateService,
+              private candidateService: CandidateService,
               private notification: NzNotificationService,
               private fb: FormBuilder
   ) {
     this.validateForm = this.fb.group({
-      fullName: this.fb.control('', [Validators.required]),
+      name: this.fb.control('', [Validators.required]),
       phoneNumber: this.fb.control('', [Validators.required]),
       email: this.fb.control('', [Validators.required]),
       password: this.fb.control('', [Validators.required]),
-      createdAt: this.fb.control(new Date().toISOString()),
-      role: this.fb.control('admin')
+      role: this.fb.control('admin'),
+      organizationId: this.fb.control(null)
     });
   }
 
   signUp() {
-    this.candidateService.addNewUser(this.validateForm.value).subscribe(
+    this.candidateService.signUp(this.validateForm.value).subscribe(
       (user) => {
         this.notification.success("Success", "Account created successfully. Please verify your email and log in again.");
         this.router.navigate(['/sign-in']);
       },
       (error) => {
         console.error("Error during sign-up:", error);
-        this.handleSignUpError(error);
       }
     );
 
   }
+
   signUpOnAngular() {
     this.authService.signUpWithEmailAndPassword(this.validateForm.value).then(
       (user) => {
