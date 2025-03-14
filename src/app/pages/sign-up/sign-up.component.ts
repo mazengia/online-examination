@@ -3,7 +3,15 @@ import {Users} from '../../model/user';
 import {FireAuthService} from '../../services/fireauth.service';
 import {Router} from '@angular/router';
 import {NgIf} from '@angular/common';
-import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators
+} from '@angular/forms';
 import {NzNotificationService} from 'ng-zorro-antd/notification';
 import {NzFormControlComponent, NzFormDirective, NzFormItemComponent, NzFormLabelComponent} from 'ng-zorro-antd/form';
 import {NzInputDirective} from 'ng-zorro-antd/input';
@@ -39,9 +47,15 @@ export class SignUpComponent {
               private notification: NzNotificationService,
               private fb: FormBuilder
   ) {
+    function ethiopianPhoneValidator() {
+      return (control: AbstractControl): ValidationErrors | null => {
+        const ethiopianPhonePattern = /^(?:\+2519\d{8}|09\d{8})$/;
+        return ethiopianPhonePattern.test(control.value) ? null : {invalidPhone: true};
+      };
+    }
     this.validateForm = this.fb.group({
       name: this.fb.control('', [Validators.required]),
-      phoneNumber: this.fb.control('', [Validators.required]),
+      phoneNumber: this.fb.control('', [Validators.required, ethiopianPhoneValidator()]),
       email: this.fb.control('', [Validators.required]),
       password: this.fb.control('', [Validators.required]),
       role: this.fb.control('admin'),

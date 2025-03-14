@@ -1,15 +1,15 @@
-import {Component} from '@angular/core';
-import {FireAuthService} from '../../services/fireauth.service';
-import {Router} from '@angular/router';
-import {FormsModule} from '@angular/forms';
-import {NgIf} from '@angular/common';
-import {HTTP_INTERCEPTORS} from '@angular/common/http';
-import {AuthInterceptorService} from '../../auth-interceptor.service';
+import { Component } from '@angular/core';
+import { FireAuthService } from '../../services/fireauth.service';
+import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { NgIf } from '@angular/common';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthInterceptorService } from '../../auth-interceptor.service';
 
 @Component({
   selector: 'app-sign-in',
   templateUrl: './sign-in.component.html',
-  styleUrl: './sign-in.component.css',
+  styleUrls: ['./sign-in.component.css'],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
@@ -27,9 +27,7 @@ export class SignInComponent {
   password = '';
   errorMessage = '';
 
-  constructor(private authService: FireAuthService, private router: Router) {
-  }
-
+  constructor(private authService: FireAuthService, private router: Router) { }
 
   signIn() {
     if (this.email && this.password) {
@@ -37,20 +35,20 @@ export class SignInComponent {
         (user) => {
           console.log('User signed in successfully:', user);
           const token = user.idToken;
-          const email = user.email
+          const email = user.email;
           localStorage.setItem('firebase_token', token);
           localStorage.setItem('firebase_user', email);
-          this.router.navigate(['/welcome']);
+          this.router.navigate(['/welcome']).then(() => {
+            window.location.reload();
+          });
         },
         (error) => {
-          this.errorMessage = error.message || 'An error occurred during sign-in.';
-          console.error('Sign in error:', error);
+          this.errorMessage = error?.error?.ApiError?.message || 'An error occurred during sign-in.';
+          console.error('Sign in error:', error?.error?.ApiError?.message);
         }
       );
     } else {
       this.errorMessage = 'Please fill in both email and password.';
     }
   }
-
-
 }

@@ -53,8 +53,9 @@ export class NewCandidateComponent implements OnInit {
     function ethiopianPhoneValidator() {
       return (control: AbstractControl): ValidationErrors | null => {
         const ethiopianPhonePattern = /^(?:\+2519\d{8}|09\d{8})$/;
-        return ethiopianPhonePattern.test(control.value) ? null : { invalidPhone: true };
-      };    }
+        return ethiopianPhonePattern.test(control.value) ? null : {invalidPhone: true};
+      };
+    }
 
     this.validateForm = this.fb.group({
       name: this.fb.control('', [Validators.required]),
@@ -84,7 +85,7 @@ export class NewCandidateComponent implements OnInit {
   ethiopianPhoneValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       const ethiopianPhonePattern = /^(?:\+2519\d{8}|09\d{8})$/;
-      return ethiopianPhonePattern.test(control.value) ? null : { invalidPhone: true };
+      return ethiopianPhonePattern.test(control.value) ? null : {invalidPhone: true};
     };
   };
 
