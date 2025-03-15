@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
-import {FireAuthService} from './services/fireauth.service';
 import {NzDropdownMenuComponent, NzDropDownDirective} from 'ng-zorro-antd/dropdown';
 import {NzAvatarComponent} from 'ng-zorro-antd/avatar';
 import {NzDividerComponent} from 'ng-zorro-antd/divider';
@@ -36,24 +35,23 @@ export class AppComponent implements OnInit {
   authenticateEmail: string | null = ''
 
   constructor(
-    private authService: FireAuthService,
     private router: Router
   ) {
   }
 
   ngOnInit() {
     const token = localStorage.getItem('firebase_token');
-    const user = localStorage.getItem('firebase_user');
-    this.authenticateEmail=user;
+    this.authenticateEmail = localStorage.getItem('displayName');
     this.isAuthenticated = !!token;
   }
 
   onLogOut() {
-    this.authService.signOut().then(() => {
-      localStorage.removeItem('firebase_token');
-      localStorage.removeItem('firebase_user');
-      this.isAuthenticated = false;
-      this.router.navigate(['/sign-in']);
-    });
+    localStorage.removeItem('firebase_token');
+    localStorage.removeItem('firebase_refresh_token');
+    localStorage.removeItem('firebase_token_expiry');
+    localStorage.removeItem('firebase_user');
+    localStorage.removeItem('displayName');
+    this.router.navigate(['/sign-in']);
   }
+
 }

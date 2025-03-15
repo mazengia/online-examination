@@ -70,6 +70,8 @@ export class SignUpComponent {
         this.router.navigate(['/sign-in']);
       },
       (error) => {
+        this.notification.error("Error", error?.error?.ApiError?.debugMessage);
+
         console.error("Error during sign-up:", error);
       }
     );

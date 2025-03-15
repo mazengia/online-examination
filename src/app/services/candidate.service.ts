@@ -59,12 +59,7 @@ export class CandidateService {
   }
 
   signUp(user: any): Observable<any> {
-
-    return this.http.post<any>(`${baseUrl}/new-account`, user).pipe(
-      catchError(error => {
-        return throwError(() => new Error(error.message));
-      })
-    );
+    return this.http.post<any>(`${baseUrl}/new-account`, user);
   }
 
 

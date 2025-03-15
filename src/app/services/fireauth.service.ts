@@ -9,6 +9,7 @@ import {map} from 'rxjs/operators';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../environments/environment';
 import {Injectable} from '@angular/core';
+import {AuthResponse} from '../model/authResponse';
 const baseUrl = environment.url;
 
 @Injectable({
@@ -49,9 +50,9 @@ export class FireAuthService {
     }
   }
 
-  login(email: string, password: string): Observable<any> {
+  login(email: string, password: string): Observable<AuthResponse> {
     const loginData = {email, password};
-    return this.http.post<any>(`${baseUrl}/authenticate`, loginData);
+    return this.http.post<AuthResponse>(`${baseUrl}/authenticate`, loginData);
   }
 
   public async signInWithEmailAndPassword(email: string, password: string): Promise<UserCredential> {
